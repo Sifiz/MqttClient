@@ -14,7 +14,7 @@ WiFiClient WifiClient;
 
 void setup() {
   Serial.begin(BaudRate);
-  WiFi.begin(wifiSSID, wifipassword);
+  WiFi.begin(wifiSSID.c_str(), wifipassword.c_str());
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi...");
