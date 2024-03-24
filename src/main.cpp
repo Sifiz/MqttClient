@@ -3,7 +3,7 @@
 #include <WiFi.h>
 #include "Mqttclient.h"
 
-mqqttSettings settings("jdeedom.btssn.lan", "jeedom", "W+pL(69g8u8$hY", "romain/spa");
+mqqttSettings settings("jdeedom.btssn.lan", "jeedom", "W+pL(69g8u8$hY", "romain/spa", "client1");
 
 String wifiSSID = "IoT";
 String wifipassword = "BtsSnForEver2022";

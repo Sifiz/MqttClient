@@ -34,7 +34,9 @@ bool mqttClientClass::handle()
         reconnect();
     }
     // call m_client.loop
+    m_client.loop();
     // process message incoming from spa, by calling pullFromSpa()
+    // if message from spa, call m_client.publish and return true, else return false
     // if message from spa transfer mqtt, call m_client.publish and return true, else return false
     return false;
 }
@@ -50,10 +52,8 @@ void mqttClientClass::reconnect()
     while (!m_client.connected())
     {
         //attempt to connect
-        if (m_client.connect(m_settings.user.c_str(), m_settings.password.c_str()))
+        if (m_client.connect(m_settings.clientId.c_str(), m_settings.user.c_str(), m_settings.password.c_str()))
         {
-            //if connected, publish an announcement
-            m_client.publish(m_settings.topic.c_str(), "hello world");
             //resubscribe
             m_client.subscribe(m_settings.topic.c_str());
         }
@@ -71,4 +71,5 @@ void mqttClientClass::reconnect()
 
 void mqttClientClass::callback(const char topic, byte *payload, unsigned int length)
 {
+
 }
