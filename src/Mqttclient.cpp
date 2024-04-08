@@ -8,11 +8,13 @@ const std::map<Event::Type, String> TypeToString = {
     {Event::Type::BubbleOn, "bubble"},
     };
 
-mqttClientClass::mqttClientClass() : SpaIot::SpaClient("mqqttClientClass")
+mqttClientClass::mqttClientClass() : SpaIot::SpaClient("mqttClientClass")
 {
     TypeToString.at(Event::Type::PowerOn);
 }
-void mqttClientClass::begin(const mqqttSettings & settings, Client & client){
+
+void mqttClientClass::begin(const mqttSettings & settings, Client & client)
+{
     m_client.setServer(settings.server.c_str(), settings.port);
     //configure mqtt client
     //store settings
@@ -20,10 +22,6 @@ void mqttClientClass::begin(const mqqttSettings & settings, Client & client){
     if (m_client.connected())
     {
         m_client.subscribe(settings.topic.c_str());
-    }
-    else
-    {
-        reconnect();
     }
 }
 bool mqttClientClass::handle()
@@ -35,7 +33,7 @@ bool mqttClientClass::handle()
     }
     // call m_client.loop
     m_client.loop();
-    // process message incoming from spa, by calling pullFromSpa()
+    // process message incoming from spa, by calling pullFromSpa() 
     // if message from spa, call m_client.publish and return true, else return false
     // if message from spa transfer mqtt, call m_client.publish and return true, else return false
     return false;
