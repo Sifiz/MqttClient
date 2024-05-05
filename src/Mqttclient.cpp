@@ -6,17 +6,44 @@ using namespace SpaIot;
 const std::map<Event::Type, String> TypeToString = {
     {Event::Type::PowerOn, "power"},
     {Event::Type::BubbleOn, "bubble"},
+    {Event::Type::JetOn, "jet"},
+    {Event::Type::SanitizerOn, "sanitizer"},
+    {Event::Type::HeaterOn, "heater"},
+    {Event::Type::HeatReached, "heatreached"},
+    {Event::Type::WaterTemp, "watertemp"},
+    {Event::Type::DesiredTemp, "desiredtemp"},
+    {Event::Type::SetDesiredTemp, "setdesiredtemp"},
+    {Event::Type::SanitizerTime, "sanitizertime"},
+    {Event::Type::ErrorCode, "errorcode"},
+    {Event::Type::AmbientTemperature, "ambienttemp"},
+    {Event::Type::NoEvent, "noevent"},
+    {Event::Type::AnyEvent, "anyevent"},
     };
 
 mqttClientClass::mqttClientClass() : SpaIot::SpaClient("mqttClientClass")
 {
     TypeToString.at(Event::Type::PowerOn);
+    TypeToString.at(Event::Type::BubbleOn);
+    TypeToString.at(Event::Type::JetOn);
+    TypeToString.at(Event::Type::SanitizerOn);
+    TypeToString.at(Event::Type::HeaterOn);
+    TypeToString.at(Event::Type::HeatReached);
+    TypeToString.at(Event::Type::WaterTemp);
+    TypeToString.at(Event::Type::DesiredTemp);
+    TypeToString.at(Event::Type::SetDesiredTemp);
+    TypeToString.at(Event::Type::SanitizerTime);
+    TypeToString.at(Event::Type::ErrorCode);
+    TypeToString.at(Event::Type::AmbientTemperature);
+    TypeToString.at(Event::Type::NoEvent);
+    TypeToString.at(Event::Type::AnyEvent);
+
 }
 
 void mqttClientClass::begin(const mqttSettings & settings, Client & client)
 {
     m_client.setServer(settings.server.c_str(), settings.port);
     //configure mqtt client
+
     //store settings
     //call reconnect
     if (m_client.connected())
@@ -33,9 +60,11 @@ bool mqttClientClass::handle()
     }
     // call m_client.loop
     m_client.loop();
-    // process message incoming from spa, by calling pullFromSpa() 
+    // process message incoming from spa, by calling pullFromSpa()
+    
     // if message from spa, call m_client.publish and return true, else return false
     // if message from spa transfer mqtt, call m_client.publish and return true, else return false
+    
     return false;
 }
 
