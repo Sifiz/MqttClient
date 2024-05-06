@@ -2,42 +2,32 @@
 #include <map>
 
 using namespace SpaIot;
+//convert string to event type
+const std::map<String, Event::Type> mqttClientClass::MqttStringToType = {
+    {"power", Event::Type::PowerOn},
+    {"bubble", Event::Type::BubbleOn},
+    {"heater", Event::Type::HeaterOn},
+    {"heat_reached", Event::Type::HeatReached},
+    {"desired_temp", Event::Type::SetDesiredTemp},
+    {"water_temp", Event::Type::WaterTemp},
+    {"error_code", Event::Type::ErrorCode},
+    {"no_event", Event::Type::NoEvent},
+    {"any_event", Event::Type::AnyEvent},
+};
 
-const std::map<Event::Type, String> TypeToString = {
+//convert event type to string
+const std::map<SpaIot::Event::Type, String> mqttClientClass::EventToString = {
     {Event::Type::PowerOn, "power"},
     {Event::Type::BubbleOn, "bubble"},
-    {Event::Type::JetOn, "jet"},
-    {Event::Type::SanitizerOn, "sanitizer"},
     {Event::Type::HeaterOn, "heater"},
     {Event::Type::HeatReached, "heatreached"},
     {Event::Type::WaterTemp, "watertemp"},
     {Event::Type::DesiredTemp, "desiredtemp"},
-    {Event::Type::SetDesiredTemp, "setdesiredtemp"},
-    {Event::Type::SanitizerTime, "sanitizertime"},
     {Event::Type::ErrorCode, "errorcode"},
-    {Event::Type::AmbientTemperature, "ambienttemp"},
     {Event::Type::NoEvent, "noevent"},
     {Event::Type::AnyEvent, "anyevent"},
     };
 
-mqttClientClass::mqttClientClass() : SpaIot::SpaClient("mqttClientClass")
-{
-    TypeToString.at(Event::Type::PowerOn);
-    TypeToString.at(Event::Type::BubbleOn);
-    TypeToString.at(Event::Type::JetOn);
-    TypeToString.at(Event::Type::SanitizerOn);
-    TypeToString.at(Event::Type::HeaterOn);
-    TypeToString.at(Event::Type::HeatReached);
-    TypeToString.at(Event::Type::WaterTemp);
-    TypeToString.at(Event::Type::DesiredTemp);
-    TypeToString.at(Event::Type::SetDesiredTemp);
-    TypeToString.at(Event::Type::SanitizerTime);
-    TypeToString.at(Event::Type::ErrorCode);
-    TypeToString.at(Event::Type::AmbientTemperature);
-    TypeToString.at(Event::Type::NoEvent);
-    TypeToString.at(Event::Type::AnyEvent);
-
-}
 
 void mqttClientClass::begin(const mqttSettings & settings, Client & client)
 {
