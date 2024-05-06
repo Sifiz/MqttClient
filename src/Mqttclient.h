@@ -33,7 +33,7 @@ class mqttClientClass : public SpaIot::SpaClient
     private:
     mqttSettings m_settings; //paramètres de connexion
     mutable PubSubClient m_client; //client mqtt
-    static void callback(const char topic, byte* payload, unsigned int length);
+    static void callback(char* topic, byte* payload, unsigned int length);
     static const std::map<String, SpaIot::Event::Type> MqttStringToType;
     static const std::map<SpaIot::Event::Type, String> EventToString;
 };

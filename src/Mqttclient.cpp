@@ -28,11 +28,17 @@ const std::map<SpaIot::Event::Type, String> mqttClientClass::EventToString = {
     {Event::Type::AnyEvent, "anyevent"},
     };
 
+// Constructor
+mqttClientClass::mqttClientClass () : SpaClient ("mqttClientClass") {}
+
 
 void mqttClientClass::begin(const mqttSettings & settings, Client & client)
 {
-    m_client.setServer(settings.server.c_str(), settings.port);
     //configure mqtt client
+    m_client.setClient(client);
+    m_client.setServer(settings.server.c_str(), settings.port);
+    m_client.setCallback(mqttClientClass::callback);
+
 
     //store settings
     //call reconnect
@@ -86,7 +92,17 @@ void mqttClientClass::reconnect()
     //if connected, subscribe to topic
 }
 
-void mqttClientClass::callback(const char topic, byte *payload, unsigned int length)
+void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
 {
-
+     String p;
+     String t (topic);
+     Event event;
+     p.concat((char *)payload, length);
+     Serial.printf("message recu du topic : %s=%s\n", topic, p.c_str());
+      t.remove (0, t.lastIndexOf ("/") + 1);
+      event.setType (MqttStringToType.at (t));
+          event.setValue (p.toInt()); // Convert string to unsigned short
+      Serial.printf("\tEnvoi de l'event %s vers le spa\n", event.toString().c_str());
+      SpaMqttClient.pushToSpa (event);
 }
+mqttClientClass SpaMqttClient; // singleton object
