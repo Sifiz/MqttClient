@@ -37,4 +37,4 @@ class mqttClientClass : public SpaIot::SpaClient
     static const std::map<String, SpaIot::Event::Type> MqttStringToType;
     static const std::map<SpaIot::Event::Type, String> EventToString;
 };
-extern mqttClientClass Mqttclient;
+extern mqttClientClass MqttClient;

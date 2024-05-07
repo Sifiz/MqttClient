@@ -37,10 +37,11 @@ void mqttClientClass::begin(const mqttSettings & settings, Client & client)
     //configure mqtt client
     m_client.setClient(client);
     m_client.setServer(settings.server.c_str(), settings.port);
-    m_client.setCallback(mqttClientClass::callback);
+    m_client.setCallback(mqttClientClass::callback); //set callback function
 
 
     //store settings
+
     //call reconnect
     if (m_client.connected())
     {
@@ -49,6 +50,7 @@ void mqttClientClass::begin(const mqttSettings & settings, Client & client)
 }
 bool mqttClientClass::handle()
 {
+    Event event;
     //if no connection, call reconnect
     if (!m_client.connected())
     {
@@ -57,11 +59,30 @@ bool mqttClientClass::handle()
     // call m_client.loop
     m_client.loop();
     // process message incoming from spa, by calling pullFromSpa()
-    
-    // if message from spa, call m_client.publish and return true, else return false
-    // if message from spa transfer mqtt, call m_client.publish and return true, else return false
-    
-    return false;
+  while (pullFromSpa (event)) {
+
+    Serial.printf ("Spa Event %s received from spa\n", event.toString().c_str());
+    if (EventToString.count (event.type()) != 0) {
+      String topic, payload;
+
+      topic = m_settings.topic + "/" + EventToString.at (event.type());
+      if (event.isBoolean()) {
+
+        payload = event.value() == true ? "on" : "off";
+      }
+      else {
+
+        payload = String (event.value());
+      }
+
+      if (event.type() == Event::Type::PowerOn && event.value() == true) {
+        // force the desired temperature to be published
+        pushToSpa (Event (Event::Type::DesiredTemp, 0));
+      }
+      m_client.publish (topic.c_str(), payload.c_str());
+    }
+  }
+  return true;
 }
 
 bool mqttClientClass::isOpen() const
@@ -90,7 +111,23 @@ void mqttClientClass::reconnect()
         }
     }
     //if connected, subscribe to topic
+    for (auto item : MqttStringToType)
+    {
+        const String &topic = item.first;
+        String command = m_settings.topic + "/command/" + topic;
+        Serial.printf("The client %s subscribes to the topic %s... ", m_settings.clientId.c_str(), command.c_str());
+        if (m_client.subscribe(command.c_str()))
+        {
+            Serial.println("OK");
+        }
+        else
+        {
+            Serial.println("Failed");
+        }
+    }
 }
+
+
 
 void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
 {
@@ -103,6 +140,6 @@ void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
       event.setType (MqttStringToType.at (t));
           event.setValue (p.toInt()); // Convert string to unsigned short
       Serial.printf("\tEnvoi de l'event %s vers le spa\n", event.toString().c_str());
-      SpaMqttClient.pushToSpa (event);
+      MqttClient.pushToSpa (event);
 }
-mqttClientClass SpaMqttClient; // singleton object
+mqttClientClass MqttClient; // singleton object
