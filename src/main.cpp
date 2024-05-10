@@ -26,8 +26,8 @@ void setup() {
   Serial.println("Connected to the WiFi network");
   spa.addClient(MqttClient);
   MqttClient.begin(settings, WifiClient);
-
-  if (spa.begin() {
+  if (spa.begin(ServerSettings("SPAIOT32SSP")))
+  {
     Serial.println("Server begin succeeded");
   } else {
     Serial.println("Server begin failed");
