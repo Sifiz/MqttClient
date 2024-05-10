@@ -136,9 +136,17 @@ void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
      Event event;
      p.concat((char *)payload, length);
      Serial.printf("message recu du topic : %s=%s\n", topic, p.c_str());
-      t.remove (0, t.lastIndexOf ("/") + 1);
-      event.setType (MqttStringToType.at (t));
-          event.setValue (p.toInt()); // Convert string to unsigned short
+  t.remove (0, t.lastIndexOf ("/") + 1); // remove the prefix to get the command
+
+  event.setType (MqttStringToType.at (t));
+  if (event.isBoolean()) {
+
+    event.setValue (p == "on");
+  }
+  else {
+
+    event.setValue (p.toInt());
+  }
       Serial.printf("\tEnvoi de l'event %s vers le spa\n", event.toString().c_str());
       MqttClient.pushToSpa (event);
 }
