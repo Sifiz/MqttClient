@@ -15,6 +15,32 @@ SpaServer spa;
 // SDATA  -> GPIO23
 // SCLK   -> GPIO18
 // nWR    -> GPIO19
+//Pins configuration
+/*
+[INPUT]
+ SDATA    -> GPIO23
+ SCLK     -> GPIO18
+ nWR      -> GPIO19
+ PULSE    -> GPIO21
+ LUMIERE  -> GPIO22
+ LED      -> GPIO2
+[OUTPUT]
+ S4       -> GPIO33
+ S3       -> GPIO17
+ S2       -> GPIO16
+ S1       -> GPI27
+ [JTAG]
+TMS      -> GPIO14
+TCK      -> GPIO13
+TDO      -> GPIO15
+TDI      -> GPIO12
+NC       -> NC
+[UART]
+TXD0     -> TX
+RXD0     -> RX
+
+
+*/
 const BusSettings MyBus (23, 18, 19);
 String wifiSSID = "IoT";
 String wifipassword = "BtsSnForEver2022";
