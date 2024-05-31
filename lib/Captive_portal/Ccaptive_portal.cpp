@@ -9,7 +9,7 @@
 
 
 Portal::Portal()
-    : ssid("ESP32 Captive Portal"),
+    : ssid("Votre SPA"),
       password(""),
       wifiSSID(""),
       wifiPassword("")
@@ -25,109 +25,116 @@ const String localIPURL = "http://4.3.2.1";	 // a string version of the local IP
 
 String generateHTML() {
     String html = R"=====(
-<!DOCTYPE html> <html>
-    <head>
-      <title>ESP32 Captive Portal</title>
-      <style>
-        body {background-color: #06cc13;}
-        h1, h2 {color: white;}
-        form {text-align: center; margin-top: 20px;}
-        label {display: block; margin-bottom: 10px;}
-        input {width: 200px; padding: 5px;}
-        button {padding: 10px; background-color: #4CAF50; color: white; border: none;}
-		.custom-select 
-{
-    display: inline-block;
-    position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    border-radius: 5px;
-    box-shadow: 0 0 1em rgba(white,0.2), inset 0 0 1px rgba(white,0.8);
-    /* Styling the select background */
-    background-color: lighten(#1FBDED,20%);
+<!DOCTYPE html>
+<html lang="en">
 
-    select 
-    {
-        width: auto;
-        margin: 0;
-        padding: .75em 1.5em;
-        outline: none;
-        cursor: pointer;
-        border: none;
-        border-radius: 0;
-        background-color: transparent;
-        /* Styling the select text color */
-        color: darken(#1FBDED,35%);
-
-        /* removes the fucking native down arrow */
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        text-indent: 0.01px;
-        text-overflow: '';
-      
-        &::-ms-expand 
-        {
-            display: none;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-      
-    }
 
-    &:before,
-    &:after
-    {
-        position: absolute;
-        top: 50%;
-        right: 1em;
-        width: 0;
-        height: 0;
-        padding: 0;
-        content: '';
-        pointer-events: none;
-    }
+        .container {
+            display: flex;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    &:before 
-    {
-        transform: translateY(-125%);
-        /* Styling the down arrow */
-        border-left: .25em solid transparent;
-        border-right: .25em solid transparent;
-        border-bottom: .375em solid darken(#1FBDED,25%);
-    }
+        .text-container {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+        }
 
-    &:after 
-    {
-        /* Styling the down arrow */
-        border-left: .25em solid transparent;
-        border-right: .25em solid transparent;
-        border-top: .375em solid darken(#1FBDED,25%);
-    }
-}
-      </style>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-      <h1>Hello World!</h1>
-      <h2>This is a captive portal example. All requests will be redirected here </h2>
-       <form action="/save" method="post">
-          <label class ="custom-select" for="ssid">SSID:</label>
-            <select name="ssid" id="ssid">
+        .form-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            appearance: none; /* Remove default arrow */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23444444" width="18px" height="18px"><path d="M7 10l5 5 5-5z" /></svg>'); /* Add custom arrow */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #2358C2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1C4599;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="text-container">
+            <h3>Bienvenue dans votre SPA !</h3>
+            <p>Pour commencer à l'utiliser, connectez votre réseau ici.</p>
+            <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+            <svg fill="#2358C2" width="80px" height="80px" viewBox="0 0 50 50" version="1.2" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" overflow="inherit"><path d="M47.231 41h-16.231v4h16.397c1.348 0 1.603-1.175 1.603-1.175v-.97s-.012-1.855-1.769-1.855zm-2.245-.79c2.214 0 4.014-1.802 4.014-4.022 0-2.227-1.8-4.023-4.014-4.023-2.211 0-4.006 1.797-4.006 4.023 0 2.219 1.795 4.022 4.006 4.022zm-8.454-.21c2.106 0 3.8-1.484 3.8-3.587-.001-2.099-1.701-3.2-3.791-3.216l-5.541.702v6.101h5.532zm-18.009-26.067c2.459 0 4.448-2 4.448-4.467 0-2.467-1.989-4.466-4.448-4.466-2.457 0-4.449 1.999-4.449 4.466s1.992 4.467 4.449 4.467zm-4.542 14.456l-.04-.058-2.016-4.694-.003 9.363h6.025l1.316-1.4-3.569-1.374c-.846-.318-1.447-1.038-1.713-1.837zm1.277-.421c.195.438.556.793 1.01.956l6.877 2.549c.88.389 1.908-.015 2.294-.898.386-.889-.015-1.924-.896-2.311l-6.345-2.396-1.96-4.701 1.278-.476 1.661 4.028 4.823 1.788v-4.922l2.56 1.523 1.276 6.428c.313.918 1.304 1.401 2.218 1.084.905-.314 1.386-1.315 1.075-2.229l-1.43-6.191c-.094-.347-.293-.65-.562-.877-.733-.812-4.44-4.957-4.704-5.234-.387-.388-1.272-1.089-2.944-1.089h-6c-3.41 0-4.066 3.48-3.369 5.25l3.138 7.718zm14.742 6.032h-27.033c-.984 0-1.967.555-1.967 1.776v9.224h29v-11z"/></svg>
+        </div>
+
+        <div class="form-container">
+            <h2>Network Selection</h2>
+            <form action="/connect" method="post">
+                <label for="network">Select Network:</label>
+                <select id="network" name="network">
     )=====";
-
-		for (int i = 0; i < n; ++i) {
+                    for (int i = 0; i < n; ++i) {
 				html += "<option value=\"" + WiFi.SSID(i)+ "\">" + WiFi.SSID(i) + "</option>";
 		}
+        html += R"=====(
+                </select>
 
-		html += R"=====(
-						</select>
-						<br><br>
-					<label for="password">Password:</label>
-					<input type="password" id="password" name="password" required><br>
-					<button type="submit">Save</button>
-				</form>
-		</body>
-	</html>
+                <label for="password">Enter Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password">
+
+                <button type="submit">Connect</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
 )=====";
     return html;
 }
@@ -218,9 +225,9 @@ String Portal::initPortal() {
 	server.on("/canonical.html", [](AsyncWebServerRequest *request) { request->redirect(localIPURL); });	   // firefox captive portal call home
 	server.on("/success.txt", [](AsyncWebServerRequest *request) { request->send(200); });					   // firefox captive portal call home
 	server.on("/ncsi.txt", [](AsyncWebServerRequest *request) { request->redirect(localIPURL); });			   // windows call home
-	server.on("/save", HTTP_POST,[&](AsyncWebServerRequest *request) { // Capture wifiSSID and wifiPassword by reference
+	server.on("/connect", HTTP_POST,[&](AsyncWebServerRequest *request) { // Capture wifiSSID and wifiPassword by reference
 		// Read the form parameters
-		wifiSSID = request->arg("ssid");
+		wifiSSID = request->arg("network");
 		wifiPassword = request->arg("password");
 		request->redirect(localIPURL);
 	});

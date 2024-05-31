@@ -3,19 +3,14 @@
 #include <WiFi.h>
 #include "Mqttclient.h"
 #include <Ccaptive_portal.h>
-mqttSettings settings(/*server*/"jdeedom.btssn.lan",/*user*/ "jeedom",/*password*/ "W+pL(69g8u8$hY",/*topic*/ "romain/spa",/*client id*/ "client1");
+mqttSettings settings(/*server*/"jeedom.btssn.lan",/*user*/ "jeedom",/*password*/ "t7n8ajpw3LEn",/*topic*/ "spa",/*client id*/ "client1");
 
 using namespace SpaIot;
 const unsigned long BaudRate = 115200;
 
 Portal portal;
 WiFiClient WifiClient;
-SpaServer spa;
-// My bus configuration :
-// SDATA  -> GPIO23
-// SCLK   -> GPIO18
-// nWR    -> GPIO19
-//Pins configuration
+
 /*
 [INPUT]
  SDATA    -> GPIO23
@@ -41,28 +36,109 @@ RXD0     -> RX
 
 
 */
-const BusSettings MyBus (23, 18, 19);
-String wifiSSID = "IoT";
-String wifipassword = "BtsSnForEver2022";
+int sdata = 23;
+int sclk = 18;
+int nwr = 19;
+int inh = 26;
+int pulse = 21 ;
+int led = 2;
+// My button controllers
+int S1 = 27;
+int S2 = 16;
+int S3 = 17;
+int S4 = 33;
+Multiplexer Mux ("U10", {S1, S2, S3, S4}, inh); // A->GPIO5, B->GPIO4, C->GPIO15, INH->GPIO16
+const BusSettings MyBus (sdata, sclk, nwr);
+
+
+//add my config to the SpaIot library
+
+// My buttons configuration (SSP)
+// MuxA and MuxB are defined in MyBoardSettings.h
+const std::map<int, ButtonSettings> MyButtons = {
+  { Filter,   ButtonSettings (Mux, 1) },  // Filter   -> A1
+  { Bubble,   ButtonSettings (Mux, 3) },  // Bubble   -> A3
+  { TempDown, ButtonSettings (Mux, 7) },  // TempDown -> A7
+
+  { Power,    ButtonSettings (Mux, 10) },  // Power    -> B2
+  { TempUp,   ButtonSettings (Mux, 12) },  // TempUp   -> B4
+  { TempUnit, ButtonSettings (Mux, 13) },  // TempUnit -> B5
+  { Heater,   ButtonSettings (Mux, 15) }   // Heater   -> B7
+};
+
+// My custom configuration
+// MyBus is defined in MyBoardSettings.h
+// SspLeds is a SpaIot object that manages the LEDs of the SSP
+const HardwareSettings MyConfig (MyBus, SspLeds, MyButtons);
+ServerSettings MySettings;
+SpaServer spas;
+int debug = 1 ;
+String debug_wifi_ssid = "IoT";
+String debug_wifi_password = "BtsSnForEver2022";
+
+
+
+void clignoteraffichage() {
+  digitalWrite(pulse, LOW);
+  delay(100);
+  digitalWrite(pulse, HIGH);
+  delay(100);
+  digitalWrite(pulse, LOW);
+}
+
 
 void setup() {
-  portal.initPortal();  //Init the captive portal
+  HardwareSettings::addToRegister("MyConfig", MyConfig);
+  MySettings.setSpaModel("MyConfig");
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+  pinMode(pulse, OUTPUT);
+  //portal.initPortal();  //Init the captive portal
   Serial.begin(BaudRate);
+if (debug == 0) {
+  Serial.println("Portal so connect with portal wifi");
   WiFi.begin(portal.wifiSSID.c_str(), portal.wifiPassword.c_str());
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi...");
+    clignoteraffichage();
   }
   Serial.println("Connected to the WiFi network");
+  //print IP and info
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
   WiFi.softAPdisconnect(true);
-  spa.addClient(MqttClient);
+  spas.addClient(MqttClient);
   MqttClient.begin(settings, WifiClient);
-  if (spa.begin(ServerSettings("SPAIOT32SSP")))
+  if (spas.begin(ServerSettings("SPAIOT32SSP")))
   {
     Serial.println("Server begin succeeded");
   } else {
     Serial.println("Server begin failed");
     exit(EXIT_FAILURE);
+  }}
+  else {
+    Serial.println(" DEBUG MODE connect with wifi static password");
+    WiFi.begin(debug_wifi_ssid, debug_wifi_password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(1000);
+      Serial.println("Connecting to WiFi...");
+      clignoteraffichage();
+    }
+    Serial.println("Connected to the WiFi network");
+    //print IP and info
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+    WiFi.softAPdisconnect(true);
+    spas.addClient(MqttClient);
+    MqttClient.begin(settings, WifiClient);
+    if (spas.begin(MySettings))
+    {
+      Serial.println("Server begin succeeded");
+    } else {
+      Serial.println("Server begin failed");
+      exit(EXIT_FAILURE);
+    }
   }
 
   
@@ -71,5 +147,5 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  spa.handle();
+  spas.handle();
 }
