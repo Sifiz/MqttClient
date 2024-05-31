@@ -1,12 +1,12 @@
 #include "Mqttclient.h"
 #include <map>
-int photo_transistor = 32;
-int brightness = 0;
-int pwmChannel = 0; //Choisit le canal 0
-int frequence = 10000; //Fréquence PWM de 1 KHz
-int resolution = 8; // Résolution de 8 bits, 256 valeurs possibles
+const int photo_transistor = 32;
 int pwmPin = 21;
-int T = 350;
+const int PWM_CHANNEL = 0;    // ESP32 has 16 channels which can generate 16 independent waveforms
+const int PWM_FREQ = 10000;     // Recall that Arduino Uno is ~490 Hz. Official ESP32 example uses 5,000Hz
+const int PWM_RESOLUTION = 8; // We'll use same resolution as Uno (8 bits, 0-255) but ESP32 can go up to 16 bits
+const int MAX_DUTY_CYCLE = 255;
+const int DELAY_MS = 4;  // delay between fade increments
 
 using namespace SpaIot;
 //convert string to event type
@@ -52,11 +52,6 @@ void mqttClientClass::begin(const mqttSettings & settings, Client & client)
         m_client.subscribe(settings.topic.c_str());
     }
   pinMode(photo_transistor, INPUT);
-  const int PWM_CHANNEL = 0;    // ESP32 has 16 channels which can generate 16 independent waveforms
-  const int PWM_FREQ = 10000;     // Recall that Arduino Uno is ~490 Hz. Official ESP32 example uses 5,000Hz
-  const int PWM_RESOLUTION = 8; // We'll use same resolution as Uno (8 bits, 0-255) but ESP32 can go up to 16 bits
-  const int MAX_DUTY_CYCLE = 255;
-  const int DELAY_MS = 4;  // delay between fade increments
     // Sets up a channel (0-15), a PWM duty cycle frequency, and a PWM resolution (1 - 16 bits) 
   // ledcSetup(uint8_t channel, double freq, uint8_t resolution_bits);
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
@@ -161,23 +156,23 @@ void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
      //supprime retour a la ligne de p
       p.replace("\n", "");
     //integrer lumiere
-  if (t == "luxauto") {
+  while (t == "luxauto") {
       //change mode au ligt
       if (p == "on") {
         Serial.println("Lux auto received:");
         Serial.println(p);
-        int lux = analogRead(photo_transistor);
+        int lux = map(analogRead(photo_transistor), 0, 4095, 0, 255);
+        ledcWrite(PWM_CHANNEL, lux);
         Serial.println(lux);
         //print to mqqtt
         MqttClient.m_client.publish("spa/luxauto", p.c_str());
       }}
-  else
   if (t == "luxvalue" ) {
     //change frequency of pmw
     Serial.println("Lux value received:");
     Serial.println(p.toInt());
     int dutyCycle = p.toInt();
-    ledcWrite(pwmChannel, map(dutyCycle, 0, 255, 255, 0));
+    ledcWrite(PWM_CHANNEL, map(dutyCycle, 0, 255, 255, 0));
     //publish to mqqtt
     MqttClient.m_client.publish("spa/luxvalue", p.c_str());
   }

@@ -258,6 +258,12 @@ String Portal::initPortal() {
         delay(DNS_INTERVAL);
     }
 
-    // Retourner une chaîne unique contenant les deux valeurs
-    return wifiSSID + "|" + wifiPassword;
+    // Retourner une chaîne unique contenant les deux valeurs si successful
+    if (!wifiSSID.isEmpty() && !wifiPassword.isEmpty()) {
+        return wifiSSID + wifiPassword;
+    }
+    else {
+        return "ERROR";
+    }
+    
 }

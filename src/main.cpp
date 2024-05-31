@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include "Mqttclient.h"
 #include <Ccaptive_portal.h>
+#include <EEPROM.h>
 mqttSettings settings(/*server*/"jeedom.btssn.lan",/*user*/ "jeedom",/*password*/ "t7n8ajpw3LEn",/*topic*/ "spa",/*client id*/ "client1");
 
 using namespace SpaIot;
@@ -17,7 +18,7 @@ WiFiClient WifiClient;
  SCLK     -> GPIO18
  nWR      -> GPIO19
  PULSE    -> GPIO21
- LUMIERE  -> GPIO22
+ LUMIERE  -> GPIO32
  LED      -> GPIO2
 [OUTPUT]
  S4       -> GPIO33
@@ -77,7 +78,14 @@ String debug_wifi_ssid = "IoT";
 String debug_wifi_password = "BtsSnForEver2022";
 
 
-
+void writeCredentialsToEEPROM(const String& ssid, const String& password) {
+    EEPROM.begin(512);
+    EEPROM.writeString(0, ssid);
+    EEPROM.writeString(ssid.length() + 1, password);
+    EEPROM.commit();
+    EEPROM.end();
+  }
+  
 void clignoteraffichage() {
   digitalWrite(pulse, LOW);
   delay(100);
@@ -94,6 +102,7 @@ void setup() {
   digitalWrite(led, HIGH);
   pinMode(pulse, OUTPUT);
   //portal.initPortal();  //Init the captive portal
+  //write ssid and pasword to the eeprom
   Serial.begin(BaudRate);
 if (debug == 0) {
   Serial.println("Portal so connect with portal wifi");
