@@ -1,6 +1,6 @@
 #include "Mqttclient.h"
 #include <map>
-const int photo_transistor = 32;
+const int photo_transistor = 35;
 int pwmPin = 21;
 const int PWM_CHANNEL = 0;    // ESP32 has 16 channels which can generate 16 independent waveforms
 const int PWM_FREQ = 10000;     // Recall that Arduino Uno is ~490 Hz. Official ESP32 example uses 5,000Hz
@@ -8,6 +8,8 @@ const int PWM_RESOLUTION = 8; // We'll use same resolution as Uno (8 bits, 0-255
 const int MAX_DUTY_CYCLE = 255;
 const int DELAY_MS = 4;  // delay between fade increments
 
+// Définir une variable globale pour le mode "luxauto"
+bool luxautoMode = false;
 using namespace SpaIot;
 //convert string to event type
 const std::map<String, Event::Type> mqttClientClass::MqttStringToType = {
@@ -69,10 +71,24 @@ bool mqttClientClass::handle()
     }
     // call m_client.loop
     m_client.loop();
+    if (luxautoMode == true) {
+      // Exécuter le bloc de code pour le mode "luxauto"
+      int lux = map(analogRead(photo_transistor), 0, 4095, 230, 20);
+      ledcWrite(PWM_CHANNEL, lux);
+      Serial.println(lux);
+      // Publier sur MQTT
+      MqttClient.m_client.publish("spa/luxauto", "on");
+      MqttClient.m_client.publish("spa/luxvalue", String(lux).c_str());
+          }
+      else {
+        // Publier sur MQTT
+        MqttClient.m_client.publish("spa/luxauto", "off");
+      }
     // process message incoming from spa, by calling pullFromSpa()
   while (pullFromSpa (event)) {
 
     Serial.printf ("Spa Event %s received from spa\n", event.toString().c_str());
+    
     if (EventToString.count (event.type()) != 0) {
       String topic, payload;
 
@@ -93,6 +109,7 @@ bool mqttClientClass::handle()
       m_client.publish (topic.c_str(), payload.c_str());
     }
   }
+  
   return true;
 }
 
@@ -143,7 +160,6 @@ void mqttClientClass::reconnect()
 }
 
 
-
 void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
 {
      String p;
@@ -156,17 +172,15 @@ void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
      //supprime retour a la ligne de p
       p.replace("\n", "");
     //integrer lumiere
-  while (t == "luxauto") {
-      //change mode au ligt
+  if (t == "luxauto") {
       if (p == "on") {
-        Serial.println("Lux auto received:");
-        Serial.println(p);
-        int lux = map(analogRead(photo_transistor), 0, 4095, 0, 255);
-        ledcWrite(PWM_CHANNEL, lux);
-        Serial.println(lux);
-        //print to mqqtt
-        MqttClient.m_client.publish("spa/luxauto", p.c_str());
-      }}
+        luxautoMode = true;
+      } 
+      else{
+        luxautoMode = false;
+  }
+  return;
+  }
   if (t == "luxvalue" ) {
     //change frequency of pmw
     Serial.println("Lux value received:");
@@ -190,5 +204,6 @@ void mqttClientClass::callback(char* topic, byte *payload, unsigned int length)
   }
       Serial.printf("\tEnvoi de l'event %s vers le spa\n", event.toString().c_str());
       MqttClient.pushToSpa (event);
-}}
+}
+}
 mqttClientClass MqttClient; // singleton object

@@ -73,7 +73,7 @@ const std::map<int, ButtonSettings> MyButtons = {
 const HardwareSettings MyConfig (MyBus, SspLeds, MyButtons);
 ServerSettings MySettings;
 SpaServer spas;
-int debug = 1 ;
+int debug = 0 ;
 String debug_wifi_ssid = "IoT";
 String debug_wifi_password = "BtsSnForEver2022";
 
@@ -101,10 +101,10 @@ void setup() {
   pinMode(led, OUTPUT);
   digitalWrite(led, HIGH);
   pinMode(pulse, OUTPUT);
-  //portal.initPortal();  //Init the captive portal
   //write ssid and pasword to the eeprom
   Serial.begin(BaudRate);
 if (debug == 0) {
+  portal.initPortal();  //Init the captive portal
   Serial.println("Portal so connect with portal wifi");
   WiFi.begin(portal.wifiSSID.c_str(), portal.wifiPassword.c_str());
   while (WiFi.status() != WL_CONNECTED) {
